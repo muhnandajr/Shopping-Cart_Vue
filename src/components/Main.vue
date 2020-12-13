@@ -6,71 +6,17 @@
     <div class="container mb-4">
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th> </th>
-                            <th scope="col" style="color:DarkSlateBlue">Items</th>
-                            <th scope="col" style="color:DarkSlateBlue">Quantity</th>
-                            <th scope="col" style="color:DarkSlateBlue">Price</th>
-                            <th> </th>
-                        </tr>
-                    </thead>
-                    
-                      <tr>
-                        <td></td>
-                        <td style="color:DarkSlateBlue">Indomie</td>
-                        <td style="color:DarkSlateBlue">2</td>
-                        <td style="color:DarkSlateBlue">5.000</td>
-                        <td></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td style="color:DarkSlateBlue">Aqua</td>
-                        <td style="color:DarkSlateBlue">1</td>
-                        <td style="color:DarkSlateBlue">2.500</td>
-                        <td></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td style="color:DarkSlateBlue">Tricks</td>
-                        <td style="color:DarkSlateBlue">2</td>
-                        <td style="color:DarkSlateBlue">2.000</td>
-                        <td></td>
-                      </tr>
-                      <thead>
-                      <tr>
-                        <th></th>
-                        <th style="color:DarkSlateBlue">Total</th>
-                        <th style="color:DarkSlateBlue">6</th>
-                        <th style="color:DarkSlateBlue">9.500</th>
-                        <th></th>
-                      </tr>
-                      </thead>
-                    
-                    <!-- <template slot-scope="{row}">
-                        <th scope="row">
-                            <div class="media-body text-md-center">
-                            <span class="name mb-0 text-sm">{{row.id}}</span>
-                            </div>
-                        </th>
-                        <th scope="row">
-                            <div class="media-body">
-                            <span class="name mb-0 text-sm">{{row.name}}</span>
-                            </div>
-                        </th>
-                        <th scope="row">
-                            <div class="media-body text-md-center">
-                            <span class="name mb-0 text-sm">{{row.address}}</span>
-                            </div>
-                        </th>
-                    </template> -->
-                </table>
+                         <div>
+    <b-table striped hover :items="tableData" :fields="fields"></b-table>
+          <strong><p align=right>Total Product: {{total_product}}    Total Price: {{total}}</p> </strong>
+
+
+  </div>
         </div>
     </div>
           <span style="float: right">
             <div class="add">
-              <b-button :pressed="true" variant="primary">Add Promo</b-button>
+              <b-button :pressed="true" variant="primary" @click="deleteCart">Add Promo</b-button>
             </div>
         
             <div class="pay">
@@ -88,7 +34,7 @@
 
 
 <script>
-// import CompanyDataService from "../../services/CompanyDataService";
+import CartDataService from "../services/CartDataService";
 
   export default {
     name: 'projects-table',
@@ -102,29 +48,54 @@
       return {
         pagination: {
         default: 1
-      },
+      },fields:['product_id','name','quantity','price'],
         tableData: 
         [{
             
           }],
-          title_search:''
+          title_search:'',
       }
     },
-//     methods: {
-//     retrieveCompany() {
-//       CompanyDataService.getAll()
-//         .then(response => {
-//           this.tableData = response.data;
-//           console.log(response.data);
-//         })
-//         .catch(e => {
-//           console.log(e);
-//         });
-//     },
-//   },
-//     mounted() {
-//     this.retrieveCompany();
-//   }
+    methods: {
+    retrieveCart() {
+      CartDataService.getAll()
+        .then(response => {
+          this.tableData = response.data;
+          console.log(response.data);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+     deleteCart() {
+      CartDataService.deleteAll()
+        .then(response => {
+          console.log(response.data);
+          // this.$router.push({ name: "topics" });
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+  },
+    mounted() {
+    this.retrieveCart();
+    this.timer = setInterval(this.retrieveCart,200)
+  },
+  computed: {
+  total: function(){
+    console.log(this.tableData);
+    return this.tableData.reduce(function(total, item){
+      return total + item.price; 
+    },0);
+  },
+  total_product: function(){
+    console.log(this.tableData);
+    return this.tableData.reduce(function(total_product, item){
+      return total_product + item.quantity; 
+    },0);
+  },
+}
 }
 </script>
 
